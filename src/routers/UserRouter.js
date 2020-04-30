@@ -7,16 +7,15 @@ const authentication = require('./../Auth/auth');
 //create a user
 router.post('/user/create', async function(request, response){
     const user = new User(request.body);
-    const token = await user.generateAuthToken();
     try{
+        const token = await user.generateAuthToken();
         await user.save();
         response.status(201).send({
             user: user.publicProfile(),
             token
         })
     }catch(e){
-        console.log(e);
-        response.status(400).send({err_code: 0,message: 'failed to create'})
+        response.status(400).send({err_code: 0,message: e.message})
     }
 })
 
@@ -27,7 +26,11 @@ router.post('/user/login', async function(request, response){
         const token = await user.generateAuthToken();
         response.send({user: user.publicProfile(), token});
     }catch(e){
-        response.status(404).send({err_code: 1, message:'user not found'})
+        if(e.message === 'User not found'){
+            response.status(404).send({err_code: 1, message: e.message})
+        }else{
+            response.status(400).send({err_code: 2, message: e.message})
+        }
     }
 })
 
@@ -48,17 +51,17 @@ router.patch('/user/update', authentication, async function(request, response){
         response.status(200).send(userF)
     }catch(e){
         console.log(e);
-        response.status(500).send('Failed to update')
+        response.status(500).send({message: e.message})
     }
 })
 
 //delete user
 router.delete('/user/delete', authentication, async function(request, response){
     try{
-        await request.user.remove();
-        response.send({message: 'success', err_code: -1})
+        const user = await request.user.remove();
+        response.send(user.publicProfile())
     }catch(e){
-        response.status(404).send(e);
+        response.status(404).send({message: e.message});
     }
 })
 
@@ -67,7 +70,7 @@ router.get('/user/me', authentication, async function(request, response){
     try{
         response.send(request.user);
     }catch(e){
-        response.status(404).send(e)
+        response.status(404).send({message: e.message})
     }
 })
 
@@ -79,7 +82,7 @@ router.post('/user/addgenre', authentication, async function(request, response){
         await request.user.save();
         response.send(request.user.genres_liked);
     }catch(e){
-        response.status(400).send(e);
+        response.status(400).send({message: e.message});
     }
 })
 
@@ -88,18 +91,30 @@ router.get('/user/genres', authentication, async function(request, response){
         const genres = request.user.genres_liked;
         response.send(genres);
     }catch(e){
-        response.status(404).send(e);
+        response.status(404).send({message: e.message});
     }
 })
 
 //delete audio liked by user
 router.delete('/user/deletegenre/:id', authentication, async function(request, response){
     try{
-        const genres = Array.from(request.user.genres_liked);
-        const updated = genres.filter( genre => genre._id !== request.params.id)        
-        response.send(updated);
+        request.user.genres_liked = request.user.genres_liked.filter((genre) => genre.genre !== request.params.id)
+        await request.user.save();
+        response.send(request.user.genres_liked);
     }catch(e){
-        response.status(404).send(e);
+        response.status(404).send({message: e.message});
+    }
+})
+
+//logout
+router.get('/user/logout', authentication, async function(request, response){
+    try{
+        request.user.tokens = request.user.tokens.filter((token) => token.token!==request.token)
+        await request.user.save();
+        response.status(200).send({message : "logged_out", name: request.user.name})
+
+    }catch(e){
+        response.status(500).send({message: e.message})
     }
 })
 

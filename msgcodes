@@ -1,3 +1,2 @@
-msg_code = 0; failed to create user
-msg_code = -1; no error
-msg_code = 3; bad operation
+err_code - 1; user not found
+err_code - 2; incorrect password

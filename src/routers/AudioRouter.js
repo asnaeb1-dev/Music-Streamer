@@ -12,7 +12,7 @@ router.post('/audio/new', authentication, async function(request, response){
         await audio.save();
         response.status(201).send(audio)
     }catch(e){
-        response.status(400).send(e)
+        response.status(400).send({message: e.message})
     }
 })
 
@@ -25,8 +25,7 @@ router.get('/audio/search', async function(request, response){
         const audio = await getMusicInfo(trackname, trackartist);
         response.send(audio);
     }catch(e){
-        console.log(e);
-        response.status(400).send(e);
+        response.status(400).send({message: e.message});
     }
 })
 
@@ -38,26 +37,21 @@ router.delete('/audio/remove/:id', authentication, async function(request, respo
         if(!audio){
             throw new Error('Audio not found');
         }
-        await audio.remove();
-        response.send('removed')
+        const removedAudio = await audio.remove();
+        response.send(removedAudio)
     }catch(e){
-        response.status(404).send(e);
+        response.status(404).send({message: e.message});
     }
 })
 
-//specialized audio removal route
-router.delete('/audio/delete', authentication, async function(request,response){
-
-})
-
-//get audio
+//get all audios
 //attach pagination to this!!!!!TODO!!!!!
 router.get('/audio/all', authentication, async function(request, response){
     try{
         const audios = await Audio.find({});
         response.send(audios);
     }catch(e){
-        response.status(404).send(e);
+        response.status(404).send({message: e.message});
     }
 })
 
@@ -67,7 +61,7 @@ router.get('/audio/me', authentication, async function(request, response){
         const audios = await Audio.find({uploaded_by: request.user._id})
         response.send(audios);
     }catch(e){
-        response.status(404).send(e);
+        response.status(404).send({message: e.message});
     }
 })
 
@@ -77,39 +71,38 @@ router.get('/audio/find', authentication, async function(request, response){
         const audio = await Audio.findOne({title: request.query.t})
         response.send(audio);
     }catch(e){
-        response.status(404).send(e)
+        response.status(404).send({message: e.message})
     }
 })
 
-// /audio/find?id={id}
+// /audio/findid?id={id}
 router.get('/audio/findid', authentication, async function(request, response){
     try{
         const audio = await Audio.findOne({_id: request.query.id})
         response.send(audio);
     }catch(e){
-        response.status(404).send(e)
+        response.status(404).send({message: e.message})
     }
 })
 
-// /audio/find?artist={artist}
+// /audio/findArtist?artist={artist}
 router.get('/audio/findArtist', authentication, async function(request, response){
     try{
         const audio = await Audio.find({artist: request.query.artist})
         response.send(audio);
     }catch(e){
-        response.status(404).send(e)
+        response.status(404).send({message: e.message})
     }
 })
 
-// /audio/find?album={album}
+// /audio/findAlbum?album={album}
 router.get('/audio/findAlbum', authentication, async function(request, response){
     try{
         const audio = await Audio.find({album: request.query.album})
         response.send(audio);
     }catch(e){
-        response.status(404).send(e)
+        response.status(404).send({message: e.message})
     }
 })
 
 module.exports = router;
-
