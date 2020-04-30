@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "env-cmd ./config/dev.env nodemon index.js"
   },
   "author": "Abhigyan Raha",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "validator": "^13.0.0"
   },
   "devDependencies": {
+    "env-cmd": "^8.0.2",
     "nodemon": "^2.0.3"
   }
 }

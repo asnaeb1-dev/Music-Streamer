@@ -7,7 +7,7 @@ const audioRouter = require('./src/routers/AudioRouter');
 const app = express();
 
 //name the port
-const port = process.env.PORT||3000;
+const port = process.env.PORT;
 
 //user express.json() to convert request into a usable json object 
 app.use(express.json());
