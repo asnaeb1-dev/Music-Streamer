@@ -73,12 +73,34 @@ router.get('/user/me', authentication, async function(request, response){
 
 //update audio liked by user
 router.post('/user/addgenre', authentication, async function(request, response){
+    const genre = request.body.genre;
+    try{
+        request.user.genres_liked.push({genre});
+        await request.user.save();
+        response.send(request.user.genres_liked);
+    }catch(e){
+        response.status(400).send(e);
+    }
+})
 
+router.get('/user/genres', authentication, async function(request, response){
+    try{
+        const genres = request.user.genres_liked;
+        response.send(genres);
+    }catch(e){
+        response.status(404).send(e);
+    }
 })
 
 //delete audio liked by user
-router.delete('/user/deletegenre', authentication, async function(request, response){
-
+router.delete('/user/deletegenre/:id', authentication, async function(request, response){
+    try{
+        const genres = Array.from(request.user.genres_liked);
+        const updated = genres.filter( genre => genre._id !== request.params.id)        
+        response.send(updated);
+    }catch(e){
+        response.status(404).send(e);
+    }
 })
 
 module.exports = router;

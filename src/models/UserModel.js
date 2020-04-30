@@ -34,8 +34,7 @@ const userSchema = new mongoose.Schema({
     },
     genres_liked:[{
             genre:{
-                type: String,
-                trim: true
+                type: String
             }
         }
     ],
