@@ -1,15 +1,17 @@
 const express = require("express");
-
+const cors = require("cors");
 require('./src/db/mongoose')
 const UserRouter = require('./src/routers/UserRouter');
 const audioRouter = require('./src/routers/AudioRouter');
 //create express method
 const app = express();
 
+
 //name the port
 const port = process.env.PORT;
 
 //user express.json() to convert request into a usable json object 
+app.use(cors());
 app.use(express.json());
 
 app.use(UserRouter);
